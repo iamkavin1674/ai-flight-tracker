@@ -195,8 +195,8 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
 
 ## Creating model ###
 
-model=ChatOllama(
-    model="qwen2.5:3b",  
+model=ChatOpenRouter(
+    model="openrouter/free",  
 
     temperature=0.3
 )
