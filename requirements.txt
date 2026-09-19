@@ -1,0 +1,6 @@
+streamlit
+langchain
+langchain-openrouter
+python-dotenv
+openrouter
+requests
