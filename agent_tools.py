@@ -176,6 +176,8 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
     try:
         icao_prefix = icao_prefix.strip().upper()
         all_states = _fetch_all_states(access_token)
+        if isinstance(all_states, dict) and "error" in all_states:
+            return all_states
  
         matches = []
         for s in all_states:
