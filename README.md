@@ -123,7 +123,7 @@ Open your browser at `http://localhost:8501` to start tracking flights!
 - *"Show me active airborne flights for airline code AIC."*
 - *"Can you give me information about airline DLH?"*
 
----
+
 
 ## 📁 Project Structure
 
@@ -131,7 +131,6 @@ Open your browser at `http://localhost:8501` to start tracking flights!
 ai-flight-tracker/
 ├── agent_tools.py   # LangChain tools, LLM configuration, and agent setup
 ├── app.py           # Streamlit web application with streaming support
-├── debug.py         # Testing script for isolated tool verification
 ├── .gitignore       # Git ignore patterns for Python & environments
 └── README.md        # Project documentation
 ```
