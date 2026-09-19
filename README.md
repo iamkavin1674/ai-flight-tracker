@@ -138,6 +138,14 @@ ai-flight-tracker/
 
 ---
 
+⚠️ Usage Notice
+
+This application relies on third-party, open-source aviation APIs such as ADSBdb and OpenSky Network. Availability, response times, rate limits, and data completeness may vary, so the app may not always work reliably.
+
+Frequent or repeated requests can also generate significant network traffic and may be subject to API/provider rate limits. Please use the application responsibly and respect the terms and usage limits of the underlying services.
+
+---
+
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
