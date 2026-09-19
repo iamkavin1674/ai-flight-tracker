@@ -1,7 +1,13 @@
 import streamlit as st
-from langchain.messages import AIMessageChunk
-from openrouter.errors.badrequestresponse_error import BadRequestResponseError
-from openrouter.errors.toomanyrequestsresponse_error import TooManyRequestsResponseError
+from langchain_core.messages import AIMessageChunk
+
+try:
+    from openrouter.errors.badrequestresponse_error import BadRequestResponseError
+    from openrouter.errors.toomanyrequestsresponse_error import TooManyRequestsResponseError
+except ImportError:
+    BadRequestResponseError = Exception
+    TooManyRequestsResponseError = Exception
+
 from agent_tools import agent
 
 st.title("✈️ AI Flight Tracker")

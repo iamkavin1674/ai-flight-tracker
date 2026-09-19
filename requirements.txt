@@ -1,8 +1,8 @@
 streamlit
 langchain
+langchain-core
 langchain-openrouter
 python-dotenv
 openrouter
 requests
-langchain_ollama 
-agent_tools
+langchain_ollama

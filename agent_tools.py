@@ -3,9 +3,15 @@ from langchain_ollama import ChatOllama
 from langchain.tools import tool
 from langchain.agents import create_agent
 from dotenv import load_dotenv
-from openrouter.errors.badrequestresponse_error import BadRequestResponseError
-from openrouter.errors.toomanyrequestsresponse_error import TooManyRequestsResponseError
 import requests
+
+try:
+    from openrouter.errors.badrequestresponse_error import BadRequestResponseError
+    from openrouter.errors.toomanyrequestsresponse_error import TooManyRequestsResponseError
+except ImportError:
+    # Graceful fallback if openrouter error classes are unavailable
+    BadRequestResponseError = Exception
+    TooManyRequestsResponseError = Exception
 
 load_dotenv()
 
@@ -46,11 +52,6 @@ def get_aircraft_type(reg_no: str):
         return{"error": f"API Error ({response.status_code})"}
     except requests.exceptions.RequestException as e: 
          return{"error": f"Network error while contacting the flight API: {str(e)}"}
-    except BadRequestResponseError as e:
-         return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    except TooManyRequestsResponseError as e:
-         return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
-    
 
 @tool 
 def get_aircraft_all_details(reg_no: str, callsign: str): 
@@ -67,10 +68,7 @@ def get_aircraft_all_details(reg_no: str, callsign: str):
             return{"error": f"API Error ({response.status_code})"}
     except requests.exceptions.RequestException as e: 
              return{"error": f"Network error while contacting the flight API: {str(e)}"}
-    except BadRequestResponseError as e:
-             return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    except TooManyRequestsResponseError as e:
-             return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
+  
 @tool 
 def get_airline(icao: str): 
     """ Query for an Airline based on an Airlines ICAO or IATA short code. 
@@ -88,13 +86,7 @@ def get_airline(icao: str):
         return{"error": f"API Error ({response.status_code})"}
     except requests.exceptions.RequestException as e: 
          return{"error": f"Network error while contacting the flight API: {str(e)}"}
-    except BadRequestResponseError as e:
-         return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    except TooManyRequestsResponseError as e:
-         return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
-
-
-
+ 
  
 OPENSKY_STATES_URL = "https://opensky-network.org/api/states/all"
 OPENSKY_TOKEN_URL = (
@@ -133,10 +125,7 @@ def get_access_token(client_id: str, client_secret: str) -> str:
         return{"error": f"API Error ({resp.status_code})"}
     except requests.exceptions.RequestException as e:
         return{"error": f"Network error while contacting the token API: {str(e)}"}
-    except BadRequestResponseError as e:
-        return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    except TooManyRequestsResponseError as e:
-        return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
+ 
  
 def _fetch_all_states(access_token: str | None = None) -> list[dict]:
     """Internal helper: fetch all current aircraft state vectors from OpenSky."""
@@ -156,11 +145,7 @@ def _fetch_all_states(access_token: str | None = None) -> list[dict]:
             return{"error": f"OpenSky states endpoint not found."}
         return{"error": f"API Error ({resp.status_code})"}
     except requests.exceptions.RequestException as e:
-        return{"error": f"Network error while contacting the OpenSky API: {str(e)}"}
-    except BadRequestResponseError as e:
-        return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    except TooManyRequestsResponseError as e:
-        return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
+        return {"error": f"Network error while contacting the OpenSky API: {str(e)}"}
 
 @tool
 def fetch_all_states(access_token: str | None = None) -> list[dict]:
@@ -200,10 +185,6 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
         return{"error": f"API Error while fetching flights for airline {icao_prefix}"}
     except requests.exceptions.RequestException as e:
         return{"error": f"Network error while contacting the OpenSky API: {str(e)}"}
-    except BadRequestResponseError as e:
-        return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    except TooManyRequestsResponseError as e:
-        return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
 
 
 
@@ -211,8 +192,7 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
 ## Creating model ###
 
 model=ChatOpenRouter(
-    model="openrouter/free",  
-
+    model="google/gemini-2.0-flash-exp:free",  # Replace with any valid OpenRouter model ID
     temperature=0.3
 )
 
