@@ -4,3 +4,5 @@ langchain-openrouter
 python-dotenv
 openrouter
 requests
+langchain_ollama 
+agent_tools
