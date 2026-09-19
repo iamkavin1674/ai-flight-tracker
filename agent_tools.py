@@ -192,7 +192,7 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
 ## Creating model ###
 
 model=ChatOpenRouter(
-    model="google/gemini-2.0-flash-exp:free",  # Replace with any valid OpenRouter model ID
+    model="openrouter/free",  # Replace with any valid OpenRouter model ID
     temperature=0.3
 )
 
