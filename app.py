@@ -1,5 +1,7 @@
 import streamlit as st
 from langchain.messages import AIMessageChunk
+from openrouter.errors.badrequestresponse_error import BadRequestResponseError
+from openrouter.errors.toomanyrequestsresponse_error import TooManyRequestsResponseError
 from agent_tools import agent
 
 st.title("✈️ AI Flight Tracker")
@@ -13,27 +15,34 @@ if st.button("Track Flight"):
 
     if question:
 
-        def response_stream():
-            """Yields text tokens from the agent's streamed response."""
-            for chunk, metadata in agent.stream(
-                {
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": question
-                        }
-                    ]
-                },
-                stream_mode="messages",
-            ):
-                # Only yield content from AI message chunks that belong
-                # to the final model response (not tool-call steps).
-                if (
-                    isinstance(chunk, AIMessageChunk)
-                    and chunk.content
-                    and not chunk.tool_calls
-                    and not chunk.tool_call_chunks
-                ):
-                    yield chunk.content
+        try:
 
-        st.write_stream(response_stream()) 
+            def response_stream():
+                """Yields text tokens from the agent's streamed response."""
+                for chunk, metadata in agent.stream(
+                    {
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": question
+                            }
+                        ]
+                    },
+                    stream_mode="messages",
+                ):
+                    # Only yield content from AI message chunks that belong
+                    # to the final model response (not tool-call steps).
+                    if (
+                        isinstance(chunk, AIMessageChunk)
+                        and chunk.content
+                        and not chunk.tool_calls
+                        and not chunk.tool_call_chunks
+                    ):
+                        yield chunk.content
+
+            st.write_stream(response_stream())
+
+        except BadRequestResponseError as e:
+            st.error(f"OpenRouter Bad Request error: {str(e)}")
+        except TooManyRequestsResponseError as e:
+            st.error(f"OpenRouter rate limit exceeded: {str(e)}")
