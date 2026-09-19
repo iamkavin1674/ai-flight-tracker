@@ -4,6 +4,7 @@ from langchain.tools import tool
 from langchain.agents import create_agent
 from dotenv import load_dotenv
 from openrouter.errors.badrequestresponse_error import BadRequestResponseError
+from openrouter.errors.toomanyrequestsresponse_error import TooManyRequestsResponseError
 import requests
 
 load_dotenv()
@@ -26,6 +27,8 @@ def callsign_tracker(callsign: str):
           return{"error": f"Network error while contacting the flight API: {str(e)}"}
     except BadRequestResponseError as e:
           return{"error": f"OpenRouter Bad Request error: {str(e)}"}
+    except TooManyRequestsResponseError as e:
+          return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
    
 
 @tool 
@@ -45,7 +48,8 @@ def get_aircraft_type(reg_no: str):
          return{"error": f"Network error while contacting the flight API: {str(e)}"}
     except BadRequestResponseError as e:
          return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    
+    except TooManyRequestsResponseError as e:
+         return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
     
 
 @tool 
@@ -65,7 +69,8 @@ def get_aircraft_all_details(reg_no: str, callsign: str):
              return{"error": f"Network error while contacting the flight API: {str(e)}"}
     except BadRequestResponseError as e:
              return{"error": f"OpenRouter Bad Request error: {str(e)}"}
-    
+    except TooManyRequestsResponseError as e:
+             return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
 @tool 
 def get_airline(icao: str): 
     """ Query for an Airline based on an Airlines ICAO or IATA short code. 
@@ -85,6 +90,8 @@ def get_airline(icao: str):
          return{"error": f"Network error while contacting the flight API: {str(e)}"}
     except BadRequestResponseError as e:
          return{"error": f"OpenRouter Bad Request error: {str(e)}"}
+    except TooManyRequestsResponseError as e:
+         return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
 
 
 
@@ -128,6 +135,8 @@ def get_access_token(client_id: str, client_secret: str) -> str:
         return{"error": f"Network error while contacting the token API: {str(e)}"}
     except BadRequestResponseError as e:
         return{"error": f"OpenRouter Bad Request error: {str(e)}"}
+    except TooManyRequestsResponseError as e:
+        return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
  
 def _fetch_all_states(access_token: str | None = None) -> list[dict]:
     """Internal helper: fetch all current aircraft state vectors from OpenSky."""
@@ -150,6 +159,8 @@ def _fetch_all_states(access_token: str | None = None) -> list[dict]:
         return{"error": f"Network error while contacting the OpenSky API: {str(e)}"}
     except BadRequestResponseError as e:
         return{"error": f"OpenRouter Bad Request error: {str(e)}"}
+    except TooManyRequestsResponseError as e:
+        return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
 
 @tool
 def fetch_all_states(access_token: str | None = None) -> list[dict]:
@@ -189,6 +200,8 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
         return{"error": f"Network error while contacting the OpenSky API: {str(e)}"}
     except BadRequestResponseError as e:
         return{"error": f"OpenRouter Bad Request error: {str(e)}"}
+    except TooManyRequestsResponseError as e:
+        return{"error": f"OpenRouter rate limit exceeded: {str(e)}"}
 
 
 
