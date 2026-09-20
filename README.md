@@ -1,4 +1,4 @@
-<![CDATA[# ✈️ AI Flight Tracker
+# ✈️ AI Flight Tracker
 
 An AI-powered flight tracking chatbot built with **Streamlit**, **LangChain**, and **OpenRouter**. Ask natural-language questions about live flights, aircraft, airlines, and prices — the agent autonomously selects the right tools and streams back an answer in real time.
 
@@ -285,7 +285,3 @@ This project is open-source. Feel free to use, fork, and contribute!
 
 ---
 
-<p align="center">
-  Built with ❤️ using <b>LangChain</b>, <b>Streamlit</b>, and <b>OpenRouter</b>
-</p>
-]]>
