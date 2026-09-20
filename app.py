@@ -12,15 +12,19 @@ from agent_tools import agent
 
 st.title("✈️ AI Flight Tracker")
 
-question = st.text_input(
-    "Ask about a flight",
-    placeholder="Example: What is the status of IGO1045?"
-)
+if "messages" not in st.session_state: 
+    st.session_state.messages = []
 
-if st.button("Track Flight"):
+for msg in st.session_state.messages: 
+    with st.chat_message(msg["role"]): 
+        st.write(msg["content"])
 
-    if question:
+if question := st.chat_input("Ask about a flight"): 
+    st.session_state.messages.append({"role":"user","content":question})
+    with st.chat_message("user"):
+        st.write(question)
 
+    with st.chat_message("assistant"): 
         try:
 
             def response_stream():
@@ -46,7 +50,8 @@ if st.button("Track Flight"):
                     ):
                         yield chunk.content
 
-            st.write_stream(response_stream())
+            full_response = st.write_stream(response_stream())
+            st.session_state.messages.append({"role":"assistant", "content":full_response})
 
         except BadRequestResponseError as e:
             st.error(f"OpenRouter Bad Request error: {str(e)}")

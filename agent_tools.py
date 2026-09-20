@@ -4,6 +4,8 @@ from langchain.tools import tool
 from langchain.agents import create_agent
 from dotenv import load_dotenv
 import requests
+from flight_price import flight_prices, booking_options
+from datetime import date
 
 try:
     from openrouter.errors.badrequestresponse_error import BadRequestResponseError
@@ -15,7 +17,7 @@ except ImportError:
 
 load_dotenv()
 
-
+########################################## TOOLS #################################################################
 @tool
 def callsign_tracker(callsign: str):
     """Track an airplane when the user specifies a callsign."""
@@ -186,11 +188,14 @@ def get_active_flights_by_airline(icao_prefix: str, access_token: str | None = N
     except requests.exceptions.RequestException as e:
         return{"error": f"Network error while contacting the OpenSky API: {str(e)}"}
 
+########################################## END OF TOOLS ##########################################################
 
 
+########################################### MODEL SETTINGS #########################################################
 
-## Creating model ###
+#date config
 
+today_str = date.today().strftime("%A, %B %d, %Y")
 model=ChatOpenRouter(
     model="openrouter/free",  # Replace with any valid OpenRouter model ID
     temperature=0.3
@@ -199,7 +204,10 @@ model=ChatOpenRouter(
 ## Create Agent to do the task ##   
 agent = create_agent(  
     model=model,
-    tools=[callsign_tracker,get_aircraft_type,get_aircraft_all_details,get_airline,get_active_flights_by_airline, get_access_token]
+    tools=[callsign_tracker,get_aircraft_type,get_aircraft_all_details,get_airline,get_active_flights_by_airline, get_access_token, flight_prices, booking_options], system_prompt=( f"Today's date is {today_str}. When the user refers to relative dates "
+        f"like 'tomorrow', 'next week', or 'this Friday', calculate the exact "
+        f"date yourself in YYYY-MM-DD format before calling any tool. Never ask "
+        f"the user to provide a date they've already given you in relative terms.")
 )
 
 
