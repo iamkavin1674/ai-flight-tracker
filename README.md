@@ -1,150 +1,143 @@
 # ✈️ AI Flight Tracker
 
-An intelligent, conversational flight tracking application powered by **LangChain**, **Ollama**, and **Streamlit**. It integrates real-time ADS-B and aviation APIs to provide live tracking, aircraft metadata, and airline insights through natural language.
+An AI-powered flight tracking chatbot built with **Streamlit**, **LangChain**, and **OpenRouter**. Ask natural-language questions about live flights, aircraft, airlines, and prices — and the agent figures out which tools to call and streams back an answer in real time.
 
 ---
 
-## 🌟 Features
+## 🚀 Features
 
-- **Natural Language Flight Inquiries**: Ask questions in plain English (e.g., *"What is the status of flight IGO1045?"* or *"Show me active flights operated by Air India"*).
-- **Multi-Source Aviation Data**:
-  - **ADSBdb Integration**: Look up flight callsigns, aircraft registration details, Mode S transponder codes, and airline ICAO/IATA records.
-  - **OpenSky Network Integration**: Access live global aircraft state vectors and filter airborne flights by airline callsign prefix.
-- **Local LLM Powered**: Uses **Ollama** (`qwen2.5:3b`) with tool-calling capabilities for low-latency, private, and offline-capable reasoning.
-- **Interactive Web UI**: Clean, responsive interface built with **Streamlit** featuring real-time token streaming.
+- 🔍 **Callsign Tracking** — Look up live flight data by callsign (e.g. `UAL123`)
+- 🛩️ **Aircraft Lookup** — Query aircraft details by registration number or Mode S transponder code
+- 🏢 **Airline Info** — Retrieve airline details by ICAO or IATA code
+- 🌐 **Live State Vectors** — Fetch all currently airborne aircraft via the OpenSky Network API
+- 📊 **Active Flights by Airline** — Filter live flights by airline ICAO prefix (e.g. all `AAL` flights)
+- 💰 **Flight Prices** — Search one-way or round-trip fares via Google Flights (SerpAPI)
+- 🎫 **Booking Options** — Retrieve booking links and options for a selected flight
+- 🗓️ **Relative Date Understanding** — Say "tomorrow" or "next Friday" and the agent resolves the exact date automatically
+- ⚡ **Streaming Responses** — Responses stream token-by-token directly in the chat UI
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-                      +-------------------+
-                      |   Streamlit UI    |
-                      |     (app.py)      |
-                      +---------+---------+
-                                |
-                                v
-                      +-------------------+
-                      |  LangChain Agent  |  <--- ChatOllama (qwen2.5:3b)
-                      | (agent_tools.py)  |
-                      +----+---------+----+
-                           |         |
-              +------------+         +------------+
-              v                                   v
-    +-------------------+               +-------------------+
-    |    ADSBdb API     |               |  OpenSky Network  |
-    | (Callsign, Regis- |               | (Live States &    |
-    | tration, Airline) |               |  Active Flights)  |
-    +-------------------+               +-------------------+
+app.py               ← Streamlit UI — chat interface & streaming
+agent_tools.py       ← LangChain agent + all tool definitions
+flight_price.py      ← SerpAPI-based flight price & booking tools
+.streamlit/
+  config.toml        ← Dark purple UI theme
+.devcontainer/
+  devcontainer.json  ← GitHub Codespaces / VS Code dev container config
 ```
 
----
-
-## 🛠️ Available Agent Tools
-
-| Tool | Source | Description |
-|---|---|---|
-| `callsign_tracker` | ADSBdb | Fetches flight status, route, and aircraft details for a specific callsign. |
-| `get_aircraft_type` | ADSBdb | Queries aircraft specifications by registration number or Mode S code. |
-| `get_aircraft_all_details` | ADSBdb | Performs a combined query for both aircraft registration and callsign. |
-| `get_airline` | ADSBdb | Retrieves airline details based on ICAO or IATA short code. |
-| `get_active_flights_by_airline` | OpenSky | Fetches live airborne flights matching an airline's ICAO prefix. |
-| `get_access_token` | OpenSky | Authenticates OAuth2 client credentials for higher OpenSky rate limits (optional). |
+**APIs used:**
+| API | Purpose | Auth Required |
+|-----|---------|---------------|
+| [adsbdb.com](https://www.adsbdb.com/) | Callsign & aircraft lookup | None |
+| [OpenSky Network](https://opensky-network.org/) | Live state vectors | Optional (OAuth2 for higher rate limits) |
+| [SerpAPI](https://serpapi.com/) | Google Flights prices & booking | API Key |
+| [OpenRouter](https://openrouter.ai/) | LLM inference | API Key |
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Setup
 
 ### Prerequisites
 
-- **Python 3.10+**
-- **[Ollama](https://ollama.com/)** installed and running on your system.
+- Python 3.11+
+- An [OpenRouter](https://openrouter.ai/) API key
+- A [SerpAPI](https://serpapi.com/) API key
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/iamkavin1674/ai-flight-tracker.git
+git clone https://github.com/your-username/ai-flight-tracker.git
 cd ai-flight-tracker
 ```
 
-### 2. Set Up Virtual Environment
+### 2. Create a virtual environment
 
 ```bash
-# Windows
 python -m venv venv
+# Windows
 venv\Scripts\activate
-
-# macOS/Linux
-python3 -m venv venv
+# macOS / Linux
 source venv/bin/activate
 ```
 
-### 3. Install Dependencies
+### 3. Install dependencies
 
 ```bash
-pip install streamlit langchain langchain-ollama langchain-openrouter requests python-dotenv
+pip install -r requirements.txt
 ```
 
-### 4. Pull the LLM Model
+### 4. Configure environment variables
 
-Make sure Ollama is running, then pull the model configured in `agent_tools.py`:
-
-```bash
-ollama pull qwen2.5:3b
-```
-
-### 5. Configure Environment Variables (Optional)
-
-Create a `.env` file in the root directory if you plan to use OpenRouter or authenticated OpenSky credentials:
+Create a `.env` file in the project root:
 
 ```env
-# Optional: OpenRouter API key if switching LLM provider
 OPENROUTER_API_KEY=your_openrouter_api_key_here
+SERPAPI_KEY=your_serpapi_key_here
 ```
 
----
+> [!NOTE]
+> The `.env` file is listed in `.gitignore` and will never be committed to source control.
 
-## 🖥️ Running the Application
-
-Launch the Streamlit web app:
+### 5. Run the app
 
 ```bash
 streamlit run app.py
 ```
 
-Open your browser at `http://localhost:8501` to start tracking flights!
+The app will be available at **http://localhost:8501**.
 
 ---
 
-## 💡 Example Queries
+## ☁️ GitHub Codespaces
 
-- *"What is the status of flight IGO1045?"*
-- *"Look up aircraft information for registration VT-IFN."*
-- *"Show me active airborne flights for airline code AIC."*
-- *"Can you give me information about airline DLH?"*
-
-
-
-## 📁 Project Structure
-
-```
-ai-flight-tracker/
-├── agent_tools.py   # LangChain tools, LLM configuration, and agent setup
-├── app.py           # Streamlit web application with streaming support
-├── .gitignore       # Git ignore patterns for Python & environments
-└── README.md        # Project documentation
-```
+This project is fully configured for **GitHub Codespaces** via the `.devcontainer` setup. Just click **"Open in Codespace"** and the environment will install all dependencies and launch the Streamlit app automatically on port `8501`.
 
 ---
 
-⚠️ Usage Notice
+## 💬 Example Queries
 
-This application relies on third-party, open-source aviation APIs such as ADSBdb and OpenSky Network. Availability, response times, rate limits, and data completeness may vary, so the app may not always work reliably.
+| Query | Tool(s) Used |
+|-------|-------------|
+| `Track flight UAL123` | `callsign_tracker` |
+| `What aircraft is registration N12345?` | `get_aircraft_type` |
+| `Tell me about airline DLH` | `get_airline` |
+| `Show me all active Air India flights` | `get_active_flights_by_airline` |
+| `What are the cheapest flights from JFK to LAX tomorrow?` | `flight_prices` |
+| `I want to book that flight — show me options` | `booking_options` |
 
-Frequent or repeated requests can also generate significant network traffic and may be subject to API/provider rate limits. Please use the application responsibly and respect the terms and usage limits of the underlying services.
+---
+
+## 📦 Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `streamlit` | Web UI framework |
+| `langchain` | Agent & tool orchestration |
+| `langchain-core` | Core LangChain primitives |
+| `langchain-openrouter` | OpenRouter LLM integration |
+| `langchain-ollama` | Local Ollama LLM support |
+| `openrouter` | OpenRouter Python SDK |
+| `python-dotenv` | `.env` file loading |
+| `requests` | HTTP calls to flight APIs |
+
+---
+
+## 🎨 Theme
+
+The app uses a custom dark purple theme defined in [`.streamlit/config.toml`](.streamlit/config.toml):
+
+- **Background:** `#0d0d1a` (deep navy)
+- **Secondary Background:** `#1a1a2e`
+- **Primary Accent:** `#a855f7` (purple)
+- **Text:** `#e0e0e0`
 
 ---
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open-source. Feel free to use, fork, and contribute!
